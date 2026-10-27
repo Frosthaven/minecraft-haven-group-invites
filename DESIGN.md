@@ -68,6 +68,20 @@ A checked box sets the setting to `allies`, an unchecked box to `private`.
 - Row states: near, far (distance), other dimension (dimmed), offline (grey head), dead.
 - Full rows up to 6 members, small rows (no names) from 7.
 
+## Staying in step with FTB
+
+The mod builds on FTB and does not patch it. It writes the same data as the FTB commands and FTB's own team screen
+(inventory sidebar, **My Team**: members, Manage Allies, invites, settings).
+
+- If an owner removes a group member as an ally in FTB, the mod accepts it and does not add them back (FTB ally events).
+- An ally link that existed before the group is not removed when the member leaves the group. The mod records the links
+  it added itself.
+- Party changes (join another party, leave, party ends, ownership moves) move the member's links to match.
+- Party settings apply to every ally of the party, manual allies too. The panel should say so.
+- `ally_mode` in `ftbchunks-world.snbt` must stay `default`.
+- Removing the mod leaves the ally links in FTB. Owners can remove them there.
+- To check first: whether FTB Teams' public API can add an ally without a command.
+
 ## Decided
 
 - Groups, not per-ally permissions. One permissions panel per party, set by its owner.
