@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haven Group Invites</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;600&display=swap">
+<style>
+:root{
+  --page:#14151c; --ink:#e6e6ea; --ink-dim:#9a9aa6;
+  --mc-text:#ffffff; --mc-gray:#a0a0a0; --mc-shadow:#3f3f3f;
+  --win:#1e1e1e; --win-edge:#5a5a5a; --row:#000000a0; --row-hover:#ffffff14;
+  --btn:#6f6f6f; --btn-hi:#a8a8a8; --btn-lo:#3c3c3c;
+  --green:#55ff55; --red:#ff5555; --yellow:#ffff55; --aqua:#55ffff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;padding:32px 16px 64px}
+h1{font-size:22px;margin:0 auto 6px;max-width:1000px}
+.lede{max-width:1000px;margin:0 auto 28px;color:var(--ink-dim);font-size:14px;line-height:1.6}
+figure{max-width:1000px;margin:0 auto 40px}
+figcaption{font-size:15px;font-weight:600;margin:0 0 10px}
+figcaption span{display:block;font-weight:400;color:var(--ink-dim);font-size:13px;margin-top:2px}
+
+/* the game frame: a dimmed, blurred world behind the screen */
+.frame{
+  position:relative;width:100%;overflow:hidden;border-radius:6px;
+  background:
+    linear-gradient(#0008,#0008),
+    radial-gradient(120% 80% at 30% 20%,#5b7fa8 0%,#3d5a78 35%,#2f4a2a 60%,#24331f 100%);
+  font-family:"Pixelify Sans",monospace;
+  display:flex;justify-content:center;align-items:flex-start;padding:3.2% 0 4%;
+  font-size:clamp(9px,1.45vw,15px);
+}
+.frame{overflow:visible}.frame::after{content:"";position:absolute;inset:0;backdrop-filter:blur(2px);pointer-events:none;z-index:0}
+.t{color:var(--mc-text);text-shadow:.14em .14em 0 var(--mc-shadow);letter-spacing:.02em}
+.dim{color:var(--mc-gray)}
+
+.win{
+  position:relative;z-index:1;width:min(64%,560px);
+  background:#101010e8;border:.18em solid #000;
+  box-shadow:inset 0 0 0 .18em var(--win-edge);
+  padding:1em 1em 1.1em;
+}
+.title{text-align:center;margin:0 0 .8em}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:.35em;margin-bottom:.8em}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:.4em;
+  height:2.15em;background:var(--btn);border:.14em solid #000;
+  box-shadow:inset .14em .14em 0 var(--btn-hi),inset -.14em -.14em 0 var(--btn-lo);
+  color:#fff;text-shadow:.14em .14em 0 var(--mc-shadow);white-space:nowrap;cursor:default;padding:0 .6em
+}
+.btn.on{background:#4a4a4a;box-shadow:inset .14em .14em 0 #6c6c6c,inset -.14em -.14em 0 #2a2a2a}
+.btn.on span{text-decoration:underline;text-underline-offset:.18em}
+.btn.wide{width:100%}
+.btn.icon{width:2.15em;padding:0;font-size:1em}
+.btn.add{color:var(--green)}
+.btn.del{color:var(--red)}
+
+.search{
+  height:2em;background:#000;border:.12em solid var(--mc-gray);
+  display:flex;align-items:center;padding:0 .5em;margin-bottom:.6em
+}
+.list{display:flex;flex-direction:column;gap:.3em;min-height:12em}
+.row{
+  display:flex;align-items:center;gap:.6em;background:var(--row);
+  padding:.3em .35em;min-height:2.7em;border:.12em solid transparent
+}
+.row.sel{border-color:var(--mc-gray)}
+.row .name{flex:1;min-width:0}
+.row .sub{font-size:.78em;color:var(--mc-gray);text-shadow:none;margin-top:.1em}
+.row .badge{font-size:.78em;color:var(--aqua)}
+.row .acts{display:flex;gap:.3em}
+.head{width:2.1em;height:2.1em;image-rendering:pixelated;flex:0 0 auto}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:.8em;font-size:.82em}
+.link{color:var(--aqua);text-decoration:underline}
+
+/* alliance tab */
+.field-label{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 .3em}
+.field-label .state{font-size:.8em}
+.edit{
+  height:2.2em;background:#000;border:.12em solid #e0e0e0;
+  display:flex;align-items:center;padding:0 .5em;margin-bottom:.35em
+}
+.edit .ph{color:#707070}
+.caret{display:inline-block;width:.55em;height:.12em;background:#e0e0e0;vertical-align:-.1em;margin-left:.05em}
+.help{font-size:.8em;margin:0 0 .9em;line-height:1.45}
+.section{margin:.4em 0 .4em;font-size:.86em;color:var(--yellow);text-shadow:.14em .14em 0 #3f3f15}
+.empty{
+  border:.12em dashed #555;padding:1.6em 1em;text-align:center;line-height:1.6;font-size:.9em
+}
+
+/* permissions page */
+.back{display:flex;align-items:center;gap:.6em;margin-bottom:.8em}
+.who{display:flex;align-items:center;gap:.6em;background:var(--row);padding:.4em;margin-bottom:.8em}
+.who .head{width:2.6em;height:2.6em}
+.perm{display:flex;align-items:flex-start;gap:.65em;padding:.42em .3em}
+.perm + .perm{border-top:.08em solid #ffffff14}
+.box{
+  width:1.45em;height:1.45em;flex:0 0 auto;background:#000;border:.12em solid #e0e0e0;
+  display:grid;place-items:center;color:var(--green);font-size:1.05em;line-height:1;margin-top:.05em
+}
+.perm .lbl{line-height:1.25}
+.perm .lbl small{display:block;color:var(--mc-gray);text-shadow:none;font-size:.78em;margin-top:.12em}
+.perm .lbl code{font-family:inherit;color:#8a8a8a}
+.row{position:relative}
+.tip{
+  position:absolute;z-index:3;left:calc(100% - 5.2em);top:1.9em;white-space:nowrap;
+  background:#100010f0;padding:.35em .55em;
+  border:.12em solid;border-image:linear-gradient(#5000ffa0,#28007fa0) 1;
+  box-shadow:0 0 0 .12em #100010f0;
+}
+.tip .k{color:var(--mc-gray);font-size:.8em;display:block;margin-top:.15em}
+.btn.hover{background:#7f86c9;box-shadow:inset .14em .14em 0 #b5bbf0,inset -.14em -.14em 0 #4d5390;border-color:#fff}
+.toast{
+  position:absolute;z-index:2;right:2.2%;top:4%;background:#000c;border:.12em solid #555;
+  padding:.45em .7em;font-size:.82em
+}
+.invite{position:absolute;z-index:2;left:50%;transform:translateX(-50%);top:8%;width:min(56%,480px);background:#101010f0;border:.18em solid #000;box-shadow:inset 0 0 0 .18em #8a6bd8;padding:.9em 1em}
+.invite .row2{display:flex;gap:.5em;margin-top:.8em}
+.invite .row2 .btn{flex:1}
+.btn.ok{color:var(--green)}
+.chat{position:absolute;z-index:2;left:1.5%;bottom:4%;width:min(58%,520px);font-size:.85em;display:flex;flex-direction:column;gap:.15em}
+.chat div{background:#0008;padding:.15em .4em}
+.cmdbar{position:absolute;z-index:2;left:.6%;right:.6%;bottom:1.2%;height:2em;background:#000a;display:flex;align-items:center;padding:0 .4em}
+.sugg{position:absolute;z-index:2;left:calc(.6% + 4.7em);bottom:calc(1.2% + 2.1em);background:#000d;min-width:9em;padding:.15em 0}
+.sugg div{padding:.12em .45em}
+.sugg .hl{color:var(--yellow)}
+.hint{position:absolute;z-index:2;left:calc(.6% + .4em);bottom:calc(1.2% + 2.1em + 7.4em);background:#000a;padding:.15em .45em;font-size:.85em}
+.ex{position:relative;z-index:1;width:min(92%,900px);display:grid;grid-template-columns:1fr auto 1fr;gap:1em;align-items:center}
+.party{background:#101010e8;border:.18em solid #000;padding:.8em}
+.party.red{box-shadow:inset 0 0 0 .18em #c0392b}
+.party.blue{box-shadow:inset 0 0 0 .18em #2e6fd8}
+.party h4{margin:0 0 .5em;font-weight:400}
+.party .who{margin-bottom:.4em}
+.party .who .head{width:2em;height:2em}
+.party ul{margin:.6em 0 0;padding-left:1.1em;font-size:.82em;line-height:1.5}
+.arrow{text-align:center;font-size:.85em;line-height:1.4}
+.arrow b{display:block;font-size:2.2em;font-weight:400;color:var(--green)}
+.steps2{position:relative;z-index:1;width:min(92%,900px);margin-top:1em;background:#101010e8;border:.18em solid #000;padding:.8em 1em;font-size:.85em;line-height:1.55}
+.steps2 ol{margin:0;padding-left:1.3em}
+.steps2 li{margin-bottom:.35em}
+.game{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;font-family:"Pixelify Sans",monospace;font-size:clamp(8px,1.25vw,13px);
+  background:linear-gradient(#0002,#0002),radial-gradient(120% 90% at 60% 10%,#7fa6d6 0%,#5a86b8 30%,#4f7a3a 55%,#3a5c2a 75%,#2a4220 100%)}
+.pf{position:absolute;left:.6%;top:30%;display:flex;flex-direction:column;gap:.35em}
+.pm{display:grid;grid-template-columns:2.2em 9.5em;column-gap:.45em;align-items:center;background:#0006;padding:.25em .35em;border-left:.18em solid #ffffff22}
+.pm .head{width:2.2em;height:2.2em;grid-row:span 2}
+.pm .nm{font-size:.9em;line-height:1.05;display:flex;justify-content:space-between;gap:.4em;white-space:nowrap}
+.pm .nm small{color:var(--mc-gray);font-size:.82em}
+.hb{position:relative;height:.42em;background:#000a;margin-top:.22em;outline:.1em solid #000}
+.hb i{position:absolute;top:0;bottom:0;left:0}
+.hb .trail{background:#ffffffb0}
+.hb .abs{background:#e8c33a}
+.pm.dim{opacity:.5}
+.pm.off .head{filter:grayscale(1) brightness(.6)}
+.pm.compact{grid-template-columns:1.4em 8em;padding:.15em .3em}
+.pm.compact .head{width:1.4em;height:1.4em;grid-row:auto}
+.pm.compact .hb{margin-top:0}
+.hud-chat{position:absolute;left:.6%;bottom:16%;width:38%;display:flex;flex-direction:column;gap:.1em;font-size:.85em}
+.hud-chat div{background:#00000060;padding:.1em .35em}
+.hud-bar{position:absolute;left:50%;transform:translateX(-50%);bottom:2%;width:42%;height:9%;background:#3a2a1ccc;border:.18em solid #1a120b;box-shadow:inset 0 0 0 .14em #8a6a3a;display:flex;align-items:center;justify-content:center;gap:4%}
+.hud-bar span{display:block;height:28%;width:22%;background:#a83a3a;outline:.1em solid #000}
+.hud-bar span.f{background:#c08a3a}.hud-bar span.m{background:#3a6ad8}
+.hud-map{position:absolute;right:1%;top:2%;width:13%;aspect-ratio:1;background:#2f4a2acc;border:.18em solid #000;box-shadow:inset 0 0 0 .14em #777}
+.hud-cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-size:1.6em;opacity:.8}
+.lbl-note{position:absolute;font-size:.75em;color:#fff;background:#000a;padding:.1em .35em;border:.1em dashed #ffffff60}
+.legend{max-width:1000px;margin:0 auto;color:var(--ink-dim);font-size:13px;line-height:1.6}
+.legend b{color:var(--ink)}
+@media (max-width:640px){.win{width:92%}.frame{aspect-ratio:auto;min-height:150vw;padding:16px 0}}
+</style>
+</head>
+<body>
+
+<h1>haven-group-invites: screen mockups</h1>
+<p class="lede">Renders of the planned screens, drawn at about Minecraft GUI scale 3 over the blurred world, in the vanilla Social Interactions style. Player names and skins are placeholders. A group works like a party invite in an MMO: you invite a player, they accept, and everyone in your group gets the same permissions in your claims.</p>
+
+<!-- 1: Social screen, All tab -->
+<figure>
+  <figcaption>1. Social Interactions: All tab with the new Group tab and + buttons
+    <span>The + button sends a group invite and has a tooltip (shown on Ashkeeper). A player in your group shows "In your group". A player with an open invite shows "Invited".</span></figcaption>
+  <div class="frame">
+    <div class="win">
+      <div class="title t">Social Interactions</div>
+      <div class="tabs">
+        <div class="btn on"><span>All</span></div>
+        <div class="btn">Hidden</div>
+        <div class="btn">Blocked</div>
+        <div class="btn">Group</div>
+      </div>
+      <div class="search"><span class="dim">Search...</span></div>
+      <div class="list">
+        <div class="row"><canvas class="head" data-name="Brightmoss"></canvas><div class="name"><div class="t">Brightmoss</div><div class="sub" style="color:var(--yellow)">Invited</div></div>
+          <div class="acts"><div class="btn icon">&#9873;</div><div class="btn icon">&#128264;</div></div></div>
+        <div class="row"><canvas class="head" data-name="CobbleQueen"></canvas><div class="name"><div class="t">CobbleQueen</div><div class="sub badge">In your group</div></div>
+          <div class="acts"><div class="btn icon">&#9873;</div><div class="btn icon">&#128264;</div></div></div>
+        <div class="row"><canvas class="head" data-name="Ashkeeper"></canvas><div class="name"><div class="t">Ashkeeper</div></div>
+          <div class="tip t">Invite Ashkeeper to your group<span class="k">They can use your claims with your group permissions.</span></div>
+          <div class="acts"><div class="btn icon add hover">+</div><div class="btn icon">&#9873;</div><div class="btn icon">&#128264;</div></div></div>
+        <div class="row"><canvas class="head" data-name="Web-Driftwood" data-ghost="1"></canvas><div class="name"><div class="t">Web-Driftwood</div><div class="sub">web map visitor</div></div>
+          <div class="acts"><div class="btn icon">&#128264;</div></div></div>
+      </div>
+      <div class="foot"><span class="dim">4 players online</span><span class="link">Blocking</span></div>
+    </div>
+  </div>
+</figure>
+
+<!-- 2: /invite command -->
+<figure>
+  <figcaption>2. The /invite command
+    <span>/invite &lt;player&gt; does the same as the + button. Tab completes online player names, as other commands do. Players already in your group are not suggested.</span></figcaption>
+  <div class="frame" style="min-height:16em">
+    <div class="chat t" style="bottom:calc(1.2% + 7.6em)">
+      <div><span class="dim">&lt;CobbleQueen&gt;</span> anyone up for the nether?</div>
+    </div>
+    <div class="sugg t">
+      <div class="hl">Ashkeeper</div>
+      <div>Aspenfall</div>
+      <div>Astraea_mc</div>
+    </div>
+    <div class="cmdbar t">/invite As<span style="color:#808080">hkeeper</span></div>
+  </div>
+</figure>
+
+<!-- 3: The invite as the other player sees it -->
+<figure>
+  <figcaption>3. The invite, as Ashkeeper sees it
+    <span>Only a chat message, no window. [Accept] and [Decline] are clickable. The invite ends after 60 seconds.</span></figcaption>
+  <div class="frame" style="min-height:14em">
+    <div class="tip t" style="left:21%;top:auto;bottom:calc(4% + 3.3em)">Accept the group invite<span class="k">You can use their claims with their group permissions.<br>Your quests and claims stay yours.</span></div>
+    <div class="chat t">
+      <div><span class="dim">&lt;CobbleQueen&gt;</span> anyone up for the nether?</div>
+      <div><span style="color:var(--aqua)">Frosthaven</span> invites you to the group <span style="color:var(--aqua)">Red</span>. <span style="color:var(--green);text-decoration:underline">[Accept]</span> <span style="color:var(--red);text-decoration:underline">[Decline]</span> <span class="dim">(60 s)</span></div>
+
+    </div>
+  </div>
+</figure>
+
+<!-- 4: Group tab, member with no party -->
+<figure>
+  <figcaption>4. Group tab: Moss, a group member with no party
+    <span>Moss is in Frosthaven's group but has no FTB party, so the group gets no access to Moss's claims. Moss can invite players, but only the leader can remove them. Moss can leave the group.</span></figcaption>
+  <div class="frame">
+    <div class="win">
+      <div class="title t">Social Interactions</div>
+      <div class="tabs">
+        <div class="btn">All</div><div class="btn">Hidden</div><div class="btn">Blocked</div>
+        <div class="btn on"><span>Group</span></div>
+      </div>
+      <div class="field-label"><span class="t">My Party Name</span><span class="state dim">No party</span></div>
+      <div class="edit"><span class="ph">Type a name to create your party</span></div>
+      <p class="help" style="color:var(--yellow)">You have no party, so your group cannot use your claims. Type a name to create your FTB party and share your claims with the group.</p>
+      <div class="section">Group of Frosthaven (3)</div>
+      <div class="list" style="min-height:0">
+        <div class="row"><canvas class="head" data-name="Frosthaven"></canvas><div class="name"><div class="t">Frosthaven <span style="color:var(--yellow);font-size:.8em">Leader</span></div><div class="sub">Party <span style="color:#ff6b5b">Red</span> &middot; shares Red's claims</div></div></div>
+        <div class="row"><canvas class="head" data-name="Ashkeeper"></canvas><div class="name"><div class="t">Ashkeeper</div><div class="sub">Party <span style="color:#6ea8ff">Blue</span> &middot; shares Blue's claims</div></div></div>
+        <div class="row"><canvas class="head" data-name="Moss"></canvas><div class="name"><div class="t">Moss <span class="dim" style="font-size:.8em">(you)</span></div><div class="sub">No party &middot; shares nothing</div></div></div>
+      </div>
+      <div class="btn wide del" style="margin-top:.8em">Leave group</div>
+      <div class="foot"><span class="dim">Invite with + on the All tab or /invite</span></div>
+    </div>
+  </div>
+</figure>
+
+<!-- 5: Group tab, leader with party -->
+<figure>
+  <figcaption>5. Group tab: Frosthaven, the leader, with party "Red"
+    <span>The FTB party name saves about 1 second after typing stops. Group Permissions set what the group can do in Red's claims. Only the leader has the red - buttons, and each has a tooltip (shown on Moss).</span></figcaption>
+  <div class="frame">
+    <div class="win">
+      <div class="title t">Social Interactions</div>
+      <div class="tabs">
+        <div class="btn">All</div><div class="btn">Hidden</div><div class="btn">Blocked</div>
+        <div class="btn on"><span>Group</span></div>
+      </div>
+      <div class="field-label"><span class="t">My Party Name</span><span class="state" style="color:var(--green)">Saved</span></div>
+      <div class="edit"><span class="t">Red</span></div>
+      <p class="help dim" style="margin-bottom:.6em">This is your FTB party name. Your group members see it in invites and on the map. Invite more players with + on the All tab or <span class="t" style="color:#fff">/invite &lt;player&gt;</span>.</p>
+      <div class="btn wide" style="margin:.2em 0 .9em">Group Permissions for Red's claims &rsaquo;</div>
+      <div class="section">My Group (3)</div>
+      <div class="list" style="min-height:0">
+        <div class="row"><canvas class="head" data-name="Frosthaven"></canvas><div class="name"><div class="t">Frosthaven <span style="color:var(--yellow);font-size:.8em">Leader</span> <span class="dim" style="font-size:.8em">(you)</span></div><div class="sub">Party <span style="color:#ff6b5b">Red</span> &middot; shares Red's claims</div></div></div>
+        <div class="row"><canvas class="head" data-name="Ashkeeper"></canvas><div class="name"><div class="t">Ashkeeper</div><div class="sub">Party <span style="color:#6ea8ff">Blue</span> &middot; shares Blue's claims</div></div>
+          <div class="acts"><div class="btn icon del" title="Remove from group">&minus;</div></div></div>
+        <div class="row"><canvas class="head" data-name="Moss"></canvas><div class="name"><div class="t">Moss</div><div class="sub">No party &middot; shares nothing</div></div>
+          <div class="tip t" style="left:calc(100% - 2.6em);top:1.9em">Remove Moss from your group</div>
+          <div class="acts"><div class="btn icon del hover" title="Remove from group">&minus;</div></div></div>
+      </div>
+      <div class="section" style="margin-top:.8em">Invited (1)</div>
+      <div class="list" style="min-height:0">
+        <div class="row"><canvas class="head" data-name="Brightmoss"></canvas><div class="name"><div class="t">Brightmoss</div><div class="sub" style="color:var(--yellow)">Invited by Moss &middot; 41 s</div></div>
+          <div class="acts"><div class="btn icon del" title="Cancel invite">&minus;</div></div></div>
+      </div>
+      <div class="foot"><span class="dim">Everyone can invite</span><span class="dim">Only the leader can remove</span></div>
+    </div>
+  </div>
+</figure>
+
+<!-- 6: Group permissions -->
+<figure>
+  <figcaption>6. Group Permissions for Red's claims
+    <span>Each member sets these for their own party's claims, and the rest of the group follows them there. Only the party owner can change them. The grey text under each row names the FTB Chunks setting.</span></figcaption>
+  <div class="frame">
+    <div class="win">
+      <div class="back"><div class="btn">&lsaquo; Back</div><span class="t">Group Permissions</span></div>
+      <p class="help dim" style="margin-bottom:.6em">What your group can do in <span style="color:#ff6b5b">Red</span>'s claims. Each member sets their own for their party's claims.</p>
+      <div class="perm"><div class="box">&#10003;</div><div class="lbl t">Build in our claims<small>break and place blocks &middot; <code>block_edit_mode</code></small></div></div>
+      <div class="perm"><div class="box">&#10003;</div><div class="lbl t">Use blocks<small>chests, doors, buttons, machines &middot; <code>block_interact_mode</code></small></div></div>
+      <div class="perm"><div class="box">&#10003;</div><div class="lbl t">Use villagers and animals<small>trade, ride, leash &middot; <code>entity_interact_mode</code></small></div></div>
+      <div class="perm"><div class="box"></div><div class="lbl t">Break decorations and vehicles<small>item frames, armor stands, paintings, minecarts, boats &middot; <code>nonliving_entity_attack_mode</code></small></div></div>
+      <div class="perm"><div class="box">&#10003;</div><div class="lbl t">See our claims on the map<small><code>claim_visibility</code></small></div></div>
+      <div class="perm"><div class="box"></div><div class="lbl t">See where we are on the map<small>long-range positions &middot; <code>location_mode</code></small></div></div>
+    </div>
+  </div>
+</figure>
+
+<!-- 7: Example -->
+<figure>
+  <figcaption>7. Example: one group, three players
+    <span>Frosthaven leads the group. Ashkeeper accepted Frosthaven's invite, and Moss accepted Ashkeeper's invite.</span></figcaption>
+  <div class="frame" style="flex-direction:column;align-items:center">
+    <div class="ex" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="party red">
+        <h4 class="t">Party <span style="color:#ff6b5b">Red</span></h4>
+        <div class="who"><canvas class="head" data-name="Frosthaven"></canvas><div><div class="t">Frosthaven</div><div class="sub dim" style="font-size:.8em">group leader &middot; owner of Red</div></div></div>
+        <ul class="dim"><li>Sets Red's Group Permissions</li></ul>
+      </div>
+      <div class="party blue">
+        <h4 class="t">Party <span style="color:#6ea8ff">Blue</span></h4>
+        <div class="who"><canvas class="head" data-name="Ashkeeper"></canvas><div><div class="t">Ashkeeper</div><div class="sub dim" style="font-size:.8em">member &middot; owner of Blue</div></div></div>
+        <ul class="dim"><li>Sets Blue's Group Permissions</li></ul>
+      </div>
+      <div class="party" style="box-shadow:inset 0 0 0 .18em #555">
+        <h4 class="t dim">No party</h4>
+        <div class="who"><canvas class="head" data-name="Moss"></canvas><div><div class="t">Moss</div><div class="sub dim" style="font-size:.8em">member</div></div></div>
+        <ul class="dim"><li>Has claims, but shares none</li></ul>
+      </div>
+    </div>
+    <div class="steps2 t">
+      <ol>
+        <li>In <span style="color:#ff6b5b">Red</span>'s claims, Ashkeeper and Moss follow Red's Group Permissions, set by Frosthaven.</li>
+        <li>In <span style="color:#6ea8ff">Blue</span>'s claims, Frosthaven and Moss follow Blue's Group Permissions, set by Ashkeeper.</li>
+        <li>In Moss's claims, <span style="color:var(--red)">nobody in the group gets access</span>, because Moss has no party.</li>
+        <li>Everyone can invite. Only Frosthaven, the leader, can remove a member.</li>
+        <li>When Moss leaves or is removed, the mod takes Moss off Red's and Blue's ally lists. Allies that a party added by hand stay.</li>
+      </ol>
+    </div>
+  </div>
+</figure>
+
+<!-- 8: Group HUD -->
+<figure>
+  <figcaption>8. Group frames on the HUD: 4 members
+    <span>Pinned top-left at 30% of the screen height, growing down. You are not in the list, because your own health is in the action bar. Bars use the health bar mod's colors: blue for players, magenta for a player who hit a player in the last 30 seconds, and a white trail for recent damage.</span></figcaption>
+  <div class="game">
+    <div class="hud-map"></div>
+    <div class="hud-cross">+</div>
+    <div class="pf"><div class="pm "><canvas class="head" data-name="Ashkeeper"></canvas><div class="nm t"><span>Ashkeeper</span><small>12 m</small></div><div class="hb"><i class="trail" style="width:86%"></i><i style="width:72%;background:#4A76B8"></i></div></div><div class="pm "><canvas class="head" data-name="Moss"></canvas><div class="nm t"><span>Moss <span style="color:#d070c0;font-size:.8em">PvP</span></span><small>412 m</small></div><div class="hb"><i style="width:45%;background:#A8409A"></i></div></div><div class="pm dim"><canvas class="head" data-name="Emberly"></canvas><div class="nm t"><span>Emberly</span><small>The Nether</small></div><div class="hb"><i style="width:90%;background:#4A76B8"></i><i class="abs" style="left:90%;width:8%"></i></div></div><div class="pm off"><canvas class="head" data-name="Tidewell"></canvas><div class="nm t"><span>Tidewell</span><small>Offline</small></div><div class="hb" style="opacity:.35"></div></div></div>
+    <div class="hud-chat t"><div><span class="dim">&lt;Moss&gt;</span> brb, fighting someone</div><div><span class="dim">&lt;Ashkeeper&gt;</span> grabbing iron</div></div>
+    <div class="hud-bar"><span></span><span class="f"></span><span class="m"></span></div>
+    <div class="lbl-note" style="left:24%;top:30%">anchor: top-left, 30% down</div>
+    <div class="lbl-note" style="left:24%;top:47%">grows down &darr;</div>
+  </div>
+  <p class="legend" style="margin-top:10px">Row states, top to bottom: <b>Ashkeeper</b> near you (live, white trail after a hit), <b>Moss</b> far away (server data, 412 m) and tagged PvP, <b>Emberly</b> in another dimension (dimmed, gold absorption), <b>Tidewell</b> offline (grey head, empty bar).</p>
+</figure>
+
+<figure>
+  <figcaption>9. Group frames on the HUD: 7 members, small rows
+    <span>From 7 members the rows drop the names to fit above the chat. A group limit of 8 keeps the frames clear of the chat at GUI scale 3.</span></figcaption>
+  <div class="game">
+    <div class="hud-map"></div>
+    <div class="hud-cross">+</div>
+    <div class="pf"><div class="pm compact"><canvas class="head" data-name="Ashkeeper"></canvas><div class="hb" style=""><i style="width:72%;background:#4A76B8"></i></div></div><div class="pm compact"><canvas class="head" data-name="Moss"></canvas><div class="hb" style=""><i style="width:45%;background:#A8409A"></i></div></div><div class="pm compact"><canvas class="head" data-name="Emberly"></canvas><div class="hb" style=""><i style="width:90%;background:#4A76B8"></i></div></div><div class="pm compact"><canvas class="head" data-name="Tidewell"></canvas><div class="hb" style="opacity:.4"><i style="width:0%;background:#4A76B8"></i></div></div><div class="pm compact"><canvas class="head" data-name="Brightmoss"></canvas><div class="hb" style=""><i style="width:100%;background:#4A76B8"></i></div></div><div class="pm compact"><canvas class="head" data-name="Pinewright"></canvas><div class="hb" style=""><i style="width:30%;background:#4A76B8"></i></div></div><div class="pm compact"><canvas class="head" data-name="CobbleQueen"></canvas><div class="hb" style=""><i style="width:60%;background:#4A76B8"></i></div></div></div>
+    <div class="hud-chat t"><div><span class="dim">&lt;Pinewright&gt;</span> who has spare glass?</div></div>
+    <div class="hud-bar"><span></span><span class="f"></span><span class="m"></span></div>
+  </div>
+</figure>
+
+<p class="legend"><b>How this maps to FTB:</b> the mod keeps the group list on the server. For each group member with a party, every other group member becomes an FTB ally of that party. A checked box sets that FTB Chunks setting to <code>allies</code>, an unchecked box sets it to <code>private</code>. Settings belong to the party, so only its owner can change them.</p>
+
+<script>
+// Pixel heads (8x8) from the player name, so each placeholder player keeps one face.
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function pick(a,h,k){return a[(h>>>k)%a.length]}
+const SKIN=["#f0c8a0","#d9a477","#b57a4e","#8a5a36","#e8b896"];
+const HAIR=["#3b2a1a","#6b4423","#d8b04a","#1f1f1f","#9b3b2a","#e0e0e0","#4a5b2a"];
+const EYES=["#3a6bd8","#3f8a3f","#6b4423","#7a3fb0","#2a2a2a"];
+for(const c of document.querySelectorAll("canvas.head")){
+  const n=c.dataset.name,h=hash(n);c.width=8;c.height=8;const g=c.getContext("2d");
+  const skin=pick(SKIN,h,0),hair=pick(HAIR,h,5),eye=pick(EYES,h,11);
+  g.fillStyle=skin;g.fillRect(0,0,8,8);
+  g.fillStyle=hair;g.fillRect(0,0,8,2);g.fillRect(0,2,1,2);g.fillRect(7,2,1,2);
+  if(h&1){g.fillRect(1,2,2,1)}
+  g.fillStyle="#fff";g.fillRect(1,4,2,1);g.fillRect(5,4,2,1);
+  g.fillStyle=eye;g.fillRect(2,4,1,1);g.fillRect(5,4,1,1);
+  g.fillStyle="#00000033";g.fillRect(3,5,2,1);
+  g.fillStyle="#7a3b2a";g.fillRect(3,6,2,1);
+  if(c.dataset.ghost){g.globalCompositeOperation="source-atop";g.fillStyle="#55ffff55";g.fillRect(0,0,8,8)}
+}
+</script>
+<script>
+// Hot reload: poll this file's Last-Modified once a second and reload on a change, keeping the scroll position.
+(() => {
+  try { const y = sessionStorage.getItem("mock-scroll"); if (y) { scrollTo(0, +y); sessionStorage.removeItem("mock-scroll"); } } catch {}
+  let seen = null;
+  setInterval(async () => {
+    try {
+      const r = await fetch(location.pathname, { method: "HEAD", cache: "no-store" });
+      const stamp = r.headers.get("Last-Modified");
+      if (seen && stamp && stamp !== seen) {
+        try { sessionStorage.setItem("mock-scroll", String(scrollY)); } catch {}
+        location.reload();
+      }
+      seen = stamp || seen;
+    } catch {}
+  }, 1000);
+})();
+</script>
+</body>
+</html>
